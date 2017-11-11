@@ -1,0 +1,152 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define max 20
+typedef struct SNode*stack;
+typedef char element;
+struct SNode
+{
+    element data[max];//操作的元素
+    int top;//栈顶位置的数组下标
+    int value[max];
+    //链表表示的堆栈
+    //element data;
+    //struct snode *link;//SNode类型的指针
+
+};
+void redfromfile(char *str);//从txt中读出来,读进一个数组里
+void printfSN(char *str);//把中缀表达式读出来
+void creatstack();//建立一个堆栈的头结点
+stack push(stack ptrs,element x);//
+char pop(stack ptrs);//
+int labvalue(char x);//
+void possorting(char *str,stack ptrs);
+int main()
+{
+    char str[max];
+    redfromfile(str);//从txt中读出来,读进一个数组里
+    printfSN(str);
+    creatstack();//创立堆栈
+    //possorting(str,ptrs);
+    return 0;
+}
+
+//从文件中读取字符串
+void redfromfile(char *str)
+{
+    FILE*fp;
+    int i=0;
+     if((fp=fopen("E://poly.txt","r"))==NULL)
+    {
+        printf("fail to open!");
+        exit(0);
+    }
+    fscanf(fp,"%c",&str[0]);
+    //满足条件才能开始
+    if(str[0]=='#'){
+        do{
+        i++;
+        fscanf(fp,"%c",&str[i]);
+        }while(str[i]!='#');
+        str[i]='\0';
+    }
+}
+
+void printfSN(char *str)
+{
+    int i;
+    for(i=1;str[i]!='\0';i++){
+        printf("%c",str[i]);
+    }
+}
+
+//建立一个堆栈,大小为max
+void creatstack()
+{
+    stack ptrs;
+    ptrs=(stack)malloc(sizeof(struct SNode));
+    ptrs->top=-1;
+    do{
+        ptrs->top++;
+        ptrs->data[ptrs->top]=0;
+        ptrs->value[ptrs->top]=0;
+        ptrs=(stack)malloc(sizeof(struct SNode));
+    }while(ptrs->top!=max-1);
+}
+
+//压入堆栈
+stack push(stack ptrs,element x)
+{
+    if(ptrs->top==max-1){
+        printf("full");
+        return 0;
+    }else{
+        ptrs->data[++(ptrs->top)]=x;
+        int  m=labvalue(x);
+        ptrs->value[++(ptrs->top)]=m;
+        return ptrs;
+    }
+}
+
+//弹出栈
+char pop(stack ptrs)
+{
+    char x;
+    if(ptrs->top==-1){
+        printf("empty");
+        return 0;
+    }else{
+        x=ptrs->data[(ptrs->top)--];
+    }
+    return x;
+}
+
+//对运算级别进行赋值
+int labvalue(char x)
+{
+    int value;
+    switch(x){
+        case '+':
+        case '-':
+            value=0;
+            break;
+        default:
+            value=2;
+            break;
+    }
+    return value;
+}
+
+//进行后缀排序
+void possorting(char *str,stack ptrs)
+{
+    int i=0;int value;
+    char m;
+    //没有读取完，依次进行操作
+    while(!str){
+        i++;
+        if(str[i]=='+' || str[i]=='-' || str[i]=='/' ||str[i]=='*' ){
+        //遇到运算符的情况
+            value=labvalue(str[i]);
+            while(value <= ptrs->value[i-1]){
+                pop(ptrs);
+                printf("%c",str[i]);
+            }
+            //本次的运算符优先级大于栈顶运算符的优先级，把它压栈
+            push(ptrs,str[i]);
+        }else if(str[i]=='('){
+            //遇到左括号的情况,压入堆栈
+            push(ptrs,str[i]);
+        }else if(str[i]==')'){
+        /*遇到右括号的情况,栈顶的运算符弹出，直到遇到左括号
+        但是，左括号不输出*/
+            m =pop(ptrs);
+            do{
+            printf("%c",m);
+            m =pop(ptrs);
+            }while(m!='(');
+        }else{
+        //遇到数字
+        printf("%d",str[i]);
+        }
+    }
+}
