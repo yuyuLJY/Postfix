@@ -15,17 +15,18 @@ struct SNode
 };
 void redfromfile(char *str);//从txt中读出来,读进一个数组里
 void printfSN(char *str);//把中缀表达式读出来
-void creatstack();//建立一个堆栈的头结点
+stack creatstack(int max);//建立一个堆栈的头结点
 stack push(stack ptrs,element x);//
 char pop(stack ptrs);//
 int labvalue(char x);//
 void possorting(char *str,stack ptrs);
 int main()
-{
+{   
+    stack s;
     char str[max];
     redfromfile(str);//从txt中读出来,读进一个数组里
     printfSN(str);
-    creatstack();//创立堆栈
+    s =creatstack(max);//创立堆栈
     //possorting(str,ptrs);
     return 0;
 }
@@ -60,17 +61,13 @@ void printfSN(char *str)
 }
 
 //建立一个堆栈,大小为max
-void creatstack()
+stack creatstack(int max)
 {
-    stack ptrs;
-    ptrs=(stack)malloc(sizeof(struct SNode));
+    stack ptrs=(stack)malloc(sizeof(struct SNode));
+    ptrs->data=(element *)malloc(maxsize *sizeof(element));
     ptrs->top=-1;
-    do{
-        ptrs->top++;
-        ptrs->data[ptrs->top]=0;
-        ptrs->value[ptrs->top]=0;
-        ptrs=(stack)malloc(sizeof(struct SNode));
-    }while(ptrs->top!=max-1);
+    ptrs->max=max;
+    return ptrs;
 }
 
 //压入堆栈
